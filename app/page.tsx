@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import SignUp from "@/components/SignUp";
+import Steps from "@/components/Steps";
 
-export default function Home() {
-  redirect("/onboarding/step1");
-  return null;
+export default async function Page() {
+  return (
+    <div>
+      <Steps step={1} />
+      <SignUp />
+    </div>
+  );
 }
