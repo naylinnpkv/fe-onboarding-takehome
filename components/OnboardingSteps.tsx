@@ -50,7 +50,6 @@ export default function OnboardingSteps({
   const [currentStep, setCurrentStep] = useState<number>(2);
   const [dateIsInvalid, setDateIsInvalid] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
 
   const currentComponents = components.filter((c) => c.step === currentStep);
 
@@ -74,7 +73,7 @@ export default function OnboardingSteps({
           },
         }
       );
-      setUser(res.data);
+
       reset(new FormData(res.data)); //although prefilled form will not appear as we submit forms as a whole step
       const userCurStep = determineCurStep(res.data, components);
 
