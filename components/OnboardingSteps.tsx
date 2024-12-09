@@ -136,11 +136,11 @@ export default function OnboardingSteps({
           router.push("/data");
         }
       }
-    } catch (error: any) {
-      if (error.response) {
-        console.log("Error response:", error.response.data.message);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.log("Error response:", error.response?.data.message);
       } else {
-        console.log("Error:", error.message);
+        console.log("Error:", (error as Error).message);
       }
     }
   };
