@@ -9,7 +9,11 @@ interface FormData {
   password: string;
 }
 
-export default function SignUp() {
+interface SignUpProps {
+  preview?: boolean;
+}
+
+export default function SignUp({ preview = false }: SignUpProps) {
   const {
     register,
     handleSubmit,
@@ -35,7 +39,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-50 px-4 space-y-10">
+    <div
+      className={`${
+        preview ? "" : "min-h-screen"
+      } flex flex-col items-center bg-gray-50 px-4 space-y-10`}
+    >
       <div className="max-w-sm w-full flex-grow p-6 rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="space-y-4">
@@ -86,6 +94,7 @@ export default function SignUp() {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
               value="Submit"
+              disabled={preview}
             />
           </div>
         </form>

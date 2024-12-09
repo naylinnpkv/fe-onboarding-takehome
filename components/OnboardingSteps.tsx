@@ -13,6 +13,8 @@ import Address from "./Address";
 import { useRouter } from "next/navigation";
 interface OnboardingProps {
   components: ComponentSteps[];
+  preview?: boolean;
+  previewStep?: number;
 }
 
 export interface FormData {
@@ -27,7 +29,11 @@ export interface FormData {
   address?: AddressType;
 }
 
-export default function OnboardingSteps({ components }: OnboardingProps) {
+export default function OnboardingSteps({
+  components,
+  preview = false,
+  previewStep,
+}: OnboardingProps) {
   const [currentStep, setCurrentStep] = useState<number>(2);
   const [dateIsInvalid, setDateIsInvalid] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -62,6 +68,9 @@ export default function OnboardingSteps({ components }: OnboardingProps) {
   };
 
   useEffect(() => {
+    if (preview && previewStep) {
+      setCurrentStep(previewStep);
+    }
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       router.push("/");
@@ -69,9 +78,10 @@ export default function OnboardingSteps({ components }: OnboardingProps) {
     }
     currentUser(token);
     setIsMounted(true);
-  }, []);
+  }, [previewStep]);
 
   const onSubmit = async (data: FormData) => {
+    if (preview) return;
     const token = localStorage.getItem("jwtToken");
 
     if (data.day && data.month && data.year) {
@@ -113,9 +123,21 @@ export default function OnboardingSteps({ components }: OnboardingProps) {
       </div>
     );
   }
+  if (preview && currentComponents.length === 0) {
+    return (
+      <div className="text-sm text-orange-700 ">
+        Each step must have at least one component
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-50 px-4 space-y-10">
-      <Steps step={currentStep} />
+    <div
+      className={`${
+        preview ? "" : "min-h-screen"
+      } flex flex-col items-center bg-gray-50 px-4 space-y-10`}
+    >
+      {!preview && <Steps step={currentStep} />}
       <div className="max-w-sm w-full flex-grow p-6 rounded-lg">
         <div className="space-y-4">
           <form onSubmit={handleSubmit(onSubmit)}>

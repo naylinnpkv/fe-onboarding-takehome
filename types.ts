@@ -37,3 +37,10 @@ export interface ComponentSteps {
   name: string;
   step: number;
 }
+
+export enum ComponentStepLabels {
+  sign_up = "Sign Up/ Sign In",
+  about_me = "About Me",
+  address = "Address",
+  birthdate = "Birthdate",
+}
