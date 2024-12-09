@@ -5,6 +5,7 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users }: UserTableProps) {
+  console.log("USERS", users);
   return (
     <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-3xl font-semibold text-center text-gray-700 mb-6">
