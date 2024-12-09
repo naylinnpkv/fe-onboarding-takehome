@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Overview
 
-## Getting Started
+## Notes to the Reviewer
 
-First, run the development server:
+### Tech Stack
+- **Frontend:** Next.js (App Router), React Hook Form, TypeScript, Tailwind CSS
+- **Backend:** Express.js, TypeScript, PostgreSQL
+- **Deployment:**
+  - Frontend: [Vercel](https://vercel.com/)
+  - Backend and Database: [Render](https://render.com/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Key Focus Areas
+1. **Edge Case Handling:**
+   - Accounted for edge cases in user input validation and navigation to ensure smooth onboarding.
+2. **Validation and Error Handling:**
+   - Integrated React Hook Form for form state management and validation.
+3. **Persistent Onboarding Process:**
+   - Users can resume the onboarding process from where they left off, providing a seamless experience across sessions.
+4. **Improved User Experience via SSR Optimization:**
+   - Disabled caching for server-side rendered pages to ensure users always view the most recent data, enhancing real-time updates.
+   
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Additional Notes
+- **Cold Starts on Render:**
+  - The free Render deployment tier introduces cold starts, causing a few seconds of delay on the backend's initial request.
+- **Potential Future Improvements:**
+  - With additional time, I would have:
+    - Included frontend tests to validate that components tied to each step in the onboarding process are rendered correctly.
+    - Enhanced the codebase with unit and integration tests to ensure robustness.
+    - Implemented the SWR (Stale-While-Revalidate) library to manage caching effectively and improve page performance.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment Details
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Frontend
+- Hosted on **Vercel**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Backend
+- Hosted on **Render** along with the **PostgreSQL** database.
+- **Note:** Render's free tier introduces a cold start delay on initial requests.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
