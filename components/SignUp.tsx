@@ -33,8 +33,12 @@ export default function SignUp({ preview = false }: SignUpProps) {
       localStorage.setItem("jwtToken", token);
       reset();
       router.push("/onboarding");
-    } catch (e) {
-      window.alert(e);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        window.alert(error.response?.data.message);
+      } else {
+        window.alert((error as Error).message);
+      }
     }
   };
 
