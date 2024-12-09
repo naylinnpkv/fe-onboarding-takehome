@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { FormData } from "./components/OnboardingSteps";
-import { UserPayLoad } from "./types";
+import { ComponentSteps, User, UserPayLoad } from "./types";
 
 export const formToApi = (data: FormData) => {
   const payload: UserPayLoad = {};
@@ -19,17 +19,39 @@ export const formToApi = (data: FormData) => {
       ).toISOString();
       payload.userBasicData.birthdate = birthdate;
     }
-    if (data.street && data.city && data.state && data.zip) {
-      const { street, city, state, zip } = data;
-      payload.userAddress = {
-        street,
-        city,
-        state,
-        //@ts-ignore
-        zip: parseFloat(zip),
-      };
-    }
-
-    return payload;
   }
+  if (data.street && data.city && data.state && data.zip) {
+    const { street, city, state, zip } = data;
+    payload.userAddress = {
+      street,
+      city,
+      state,
+      //@ts-ignore
+      zip: parseFloat(zip),
+    };
+  }
+  return payload;
+};
+
+export const determineCurStep = (
+  user: User,
+  componentSteps: ComponentSteps[]
+): number | null => {
+  const stepFields = {
+    aboutMe: "aboutMe",
+    address: "address",
+    birthdate: "birthdate",
+  };
+
+  const sortedComponentSteps = componentSteps.sort(
+    (a: ComponentSteps, b: ComponentSteps) => a.step - b.step
+  );
+
+  for (let step of sortedComponentSteps) {
+    const field = stepFields[step.name as keyof typeof stepFields];
+    if (field && !user[field as keyof typeof user]) {
+      return step.step;
+    }
+  }
+  return null;
 };

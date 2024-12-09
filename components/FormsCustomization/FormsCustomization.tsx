@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ComponentStepLabels, ComponentSteps } from "@/types";
 import SignUp from "../SignUp";
 import OnboardingSteps from "../OnboardingSteps";
+import axios from "axios";
 
 interface FormsCustomizationProps {
   components: ComponentSteps[];
@@ -32,13 +33,24 @@ export default function FormsCustomization({
   );
 
   const handleSubmit = async () => {
-    console.log("ISBALID", isValid);
     if (!isValid) {
-      window.alert("NOT VALID");
+      window.alert("steps must be tied to at least one component!");
       return;
     }
+    try {
+      const data = curComponents.map((c) => ({ id: c.id, step: c.step }));
 
-    window.alert("good");
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/components/update`,
+        {
+          data,
+        }
+      );
+
+      if (res.data) window.alert("Components order updated");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -88,7 +100,6 @@ export default function FormsCustomization({
           <div className="flex justify-center mt-2">
             <button
               onClick={handleSubmit}
-              disabled={!isValid}
               className="px-6 py-2 bg-green-500 text-white rounded shadow hover:bg-blue-600 transition"
             >
               Submit

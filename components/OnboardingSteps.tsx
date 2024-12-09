@@ -1,6 +1,6 @@
 "use client";
 
-import { Address as AddressType, ComponentSteps, User } from "@/types";
+import { ComponentSteps, User } from "@/types";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import AboutMe from "./AboutMe";
@@ -8,7 +8,7 @@ import Steps from "./Steps";
 import BirthdatePicker from "./BirthDatePicker";
 import dayjs from "dayjs";
 import axios from "axios";
-import { formToApi } from "@/utils";
+import { determineCurStep, formToApi } from "@/utils";
 import Address from "./Address";
 import { useRouter } from "next/navigation";
 interface OnboardingProps {
@@ -17,7 +17,7 @@ interface OnboardingProps {
   previewStep?: number;
 }
 
-export interface FormData {
+export class FormData {
   aboutMe?: string;
   day?: string;
   month?: string;
@@ -26,7 +26,20 @@ export interface FormData {
   city?: string;
   state?: string;
   zip?: number;
-  address?: AddressType;
+
+  constructor(user?: User) {
+    if (user) {
+      this.aboutMe = user.aboutMe || "";
+      const birthdate = user.birthdate ? dayjs(user.birthdate) : null;
+      this.day = birthdate ? birthdate.format("DD") : "";
+      this.month = birthdate ? birthdate.format("MM") : "";
+      this.year = birthdate ? birthdate.format("YYYY") : "";
+      this.street = user.address?.street || "";
+      this.city = user.address?.city || "";
+      this.state = user.address?.state || "";
+      this.zip = user.address?.zip || undefined;
+    }
+  }
 }
 
 export default function OnboardingSteps({
@@ -48,10 +61,10 @@ export default function OnboardingSteps({
     reset,
   } = useForm<FormData>();
 
-  const maxStep = components.length;
+  const maxStep = 3;
   const router = useRouter();
 
-  const currentUser = async (token: string) => {
+  const fetchCurrentUser = async (token: string) => {
     try {
       const res = await axios<User>(
         `${process.env.NEXT_PUBLIC_BASE_URL}/users/user`,
@@ -62,6 +75,14 @@ export default function OnboardingSteps({
         }
       );
       setUser(res.data);
+      reset(new FormData(res.data)); //although prefilled form will not appear as we submit forms as a whole step
+      const userCurStep = determineCurStep(res.data, components);
+
+      if (userCurStep) {
+        setCurrentStep(userCurStep);
+      } else {
+        router.push("/data");
+      }
     } catch (e) {
       window.alert(e);
     }
@@ -70,18 +91,21 @@ export default function OnboardingSteps({
   useEffect(() => {
     if (preview && previewStep) {
       setCurrentStep(previewStep);
+      return;
     }
+
     const token = localStorage.getItem("jwtToken");
     if (!token) {
       router.push("/");
       return;
     }
-    currentUser(token);
+    fetchCurrentUser(token);
     setIsMounted(true);
   }, [previewStep]);
 
   const onSubmit = async (data: FormData) => {
     if (preview) return;
+
     const token = localStorage.getItem("jwtToken");
 
     if (data.day && data.month && data.year) {
@@ -94,9 +118,9 @@ export default function OnboardingSteps({
         return;
       }
     }
-    console.log("FORMTOAPI", formToApi(data));
+
     try {
-      await axios.post(
+      const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/users/update-create-data`,
         { data: formToApi(data) },
         {
@@ -106,7 +130,13 @@ export default function OnboardingSteps({
         }
       );
       reset();
-      setCurrentStep((prev) => (prev === maxStep ? prev : prev + 1));
+
+      if (res.data) {
+        if (currentStep < maxStep) setCurrentStep((prev) => prev + 1);
+        else {
+          router.push("/data");
+        }
+      }
     } catch (error: any) {
       if (error.response) {
         console.log("Error response:", error.response.data.message);
@@ -116,7 +146,7 @@ export default function OnboardingSteps({
     }
   };
 
-  if (!isMounted) {
+  if (!isMounted && !preview) {
     return (
       <div className="w-full min-h-screen flex justify-center items-center">
         Loading...
@@ -146,7 +176,7 @@ export default function OnboardingSteps({
             </label>
             {currentComponents.map((component) => {
               switch (component.name) {
-                case "about_me":
+                case "aboutMe":
                   return (
                     <AboutMe
                       key={component.id}

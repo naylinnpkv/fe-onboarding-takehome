@@ -6,11 +6,13 @@ export interface Address {
 }
 
 export interface UserBasicData {
+  email?: string;
   aboutMe?: string;
   birthdate?: string;
 }
 
 export interface User extends UserBasicData {
+  id: string;
   address: Address;
 }
 
@@ -39,8 +41,8 @@ export interface ComponentSteps {
 }
 
 export enum ComponentStepLabels {
-  sign_up = "Sign Up/ Sign In",
-  about_me = "About Me",
+  signUp = "Sign Up/ Sign In",
+  aboutMe = "About Me",
   address = "Address",
   birthdate = "Birthdate",
 }
